@@ -20,7 +20,7 @@
 - 🌍 [2asy.ai](https://2asy.ai) - English content, 10 daily publications for global audience
 - 🇰🇷 [2asy.net](https://2asy.net) - Korean content, optimized for Korean commuting hours
 
-**Key Achievement:** Reduced operational costs to **1/10-1/20** compared to cloud APIs (from ~$1000+/month → ~$50/month electricity)
+**Key Achievement:** Reduced operational costs to **1/10-1/20** compared to cloud APIs (from ~$100+/month → ~$5/month electricity)
 
 ---
 
@@ -30,22 +30,15 @@ This project is a **real-world deployment** showcasing components from my other 
 
 ### From [LLM-Infrastructure](https://github.com/Hannune/LLM-Infrastructure)
 
+**Architecture:**
 ```
-┌─────────────────────────────────────────┐
-│     2asy News Pipeline                  │
-└────────────┬────────────────────────────┘
-             │
-    ┌────────▼─────────┐
-    │  LiteLLM Gateway │  ← Load balancing & fallback
-    │  (Port 4000)     │     to OpenRouter
-    └────────┬─────────┘
-             │
-        ┌────┴────┬──────────┐
-        │         │          │
-   ┌────▼──┐ ┌───▼───┐ ┌───▼────┐
-   │ vLLM  │ │llama  │ │Ollama  │  ← Multi-server fleet
-   │Server │ │.cpp   │ │Fleet   │     for reliability
-   └───────┘ └───────┘ └────────┘
+2asy News Pipeline
+    ↓
+LiteLLM Gateway (Port 4000)  ← Load balancing & fallback to OpenRouter
+    ↓
+    ├─────────┬─────────┐
+    │         │         │
+  vLLM    llama.cpp   Ollama  ← Multi-server fleet for reliability
 ```
 
 **Infrastructure Components Used:**
@@ -69,33 +62,21 @@ This project is a **real-world deployment** showcasing components from my other 
 ### Complete Pipeline
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│ 1. News Collection (GDELT Collector Component)              │
-│    ↓                                                          │
-│    Keywords: ["economy", "market", "finance"]                │
-│    Filters: Top sources, English/Korean                      │
-│    Output: 50-100 articles/day                               │
-└──────────────────────────────────────────────────────────────┘
-                           ↓
-┌──────────────────────────────────────────────────────────────┐
-│ 2. LangGraph Summarization Pipeline (LOCAL LLMs)            │
-│    ↓                                                          │
-│    ┌─────────────┐    ┌──────────────┐    ┌──────────┐     │
-│    │  Collector  │ →  │ Summarizer   │ →  │ Reviewer │     │
-│    │    Node     │    │    Node      │    │   Node   │     │
-│    └─────────────┘    └──────────────┘    └──────────┘     │
-│    Fetch articles     Custom structured    Quality check    │
-│                       output (no GPT-R)    & neutrality     │
-└──────────────────────────────────────────────────────────────┘
-                           ↓
-┌──────────────────────────────────────────────────────────────┐
-│ 3. Content Publishing (Ghost CMS)                           │
-│    ↓                                                          │
-│    Schedule: 10x daily (2asy.ai), Korean peak hours (2asy.net)│
-│    Format: Structured articles with metadata                │
-└──────────────────────────────────────────────────────────────┘
-                           ↓
-                    📰 Published!
+1. News Collection (GDELT Collector Component)
+   Keywords: ["economy", "market", "finance"]
+   Filters: Top sources, English/Korean
+   Output: 50-100 articles/day
+                    ↓
+2. LangGraph Summarization Pipeline (LOCAL LLMs)
+   Collector Node → Summarizer Node → Reviewer Node
+   Fetch articles   Custom structured   Quality check
+                    output (no GPT-R)   & neutrality
+                    ↓
+3. Content Publishing (Ghost CMS)
+   Schedule: 10x daily (2asy.ai), Korean peak hours (2asy.net)
+   Format: Structured articles with metadata
+                    ↓
+                📰 Published!
 ```
 
 ### LangGraph Workflow
@@ -122,30 +103,45 @@ workflow.add_edge("review", "publish")
 
 ## ✨ Key Features
 
-### 🤖 **AI-Powered Content Generation**
-- **Custom Summarizer Agent** with structured output (dictionary format)
-- **Content Reviewer Node** ensuring clarity, neutrality, and readability
-- **Optimized for speed** - No overhead from heavy tools like standard GPT-Researcher
-- **Multi-language support** - English and Korean content generation
+### 🤖 AI-Powered Content Generation
 
-### 🏭 **Production Infrastructure**
-- **Automated scheduling** via Docker containers running 24/7
-- **Multi-server LLM fleet** managed by ollama-fleet-manager
-- **Automatic failover** via LiteLLM Gateway → OpenRouter backup
-- **Real-time monitoring** with multi-server dashboard
-- **Load balancing** across vLLM, llama.cpp, and Ollama instances
+![Custom Summarizer](https://img.shields.io/badge/✅_Custom_Summarizer-Structured_output_(dictionary_format)-00C7B7?style=for-the-badge)
 
-### 💰 **Cost Efficiency**
-- **10-20x cost reduction** compared to cloud APIs
-- Monthly costs: **~$50** (electricity only) vs **$1000+** (API fees)
-- **100% local inference** during normal operation
-- OpenRouter backup only for infrastructure failures
+![Content Reviewer](https://img.shields.io/badge/✅_Content_Reviewer-Clarity,_neutrality_&_readability-4285F4?style=for-the-badge)
 
-### 📊 **Scalability**
-- Processing **50-100 articles daily**
-- Publishing **10+ articles per site**
-- Serving **1000+ daily visitors**
-- **99.9% uptime** with automatic failover
+![Optimized Speed](https://img.shields.io/badge/⚡_Optimized_Speed-No_GPT--Researcher_overhead-FF6F00?style=for-the-badge)
+
+![Multi-language](https://img.shields.io/badge/🌐_Multi--language-English_&_Korean_generation-76B900?style=for-the-badge)
+
+### 🏭 Production Infrastructure
+
+![Automated Scheduling](https://img.shields.io/badge/🕐_Automated_Scheduling-Docker_24/7-00C7B7?style=for-the-badge)
+
+![Multi-server Fleet](https://img.shields.io/badge/🖥️_Multi--server_Fleet-ollama--fleet--manager-4285F4?style=for-the-badge)
+
+![Automatic Failover](https://img.shields.io/badge/🔄_Automatic_Failover-LiteLLM_→_OpenRouter-9C27B0?style=for-the-badge)
+
+![Real-time Monitoring](https://img.shields.io/badge/📊_Monitoring-Multi--server_dashboard-FF6F00?style=for-the-badge)
+
+![Load Balancing](https://img.shields.io/badge/⚖️_Load_Balancing-vLLM,_llama.cpp,_Ollama-76B900?style=for-the-badge)
+
+### 💰 Cost Efficiency
+
+![Cost Reduction](https://img.shields.io/badge/💰_Cost_Reduction-10--20x_vs_cloud_APIs-00C7B7?style=for-the-badge)
+
+![Monthly Cost](https://img.shields.io/badge/💵_Monthly_Cost-~$5_(electricity)_vs_$200+_(APIs)-4285F4?style=for-the-badge)
+
+![Local Inference](https://img.shields.io/badge/🏠_Local_Inference-100%25_during_normal_operation-76B900?style=for-the-badge)
+
+![Backup Only](https://img.shields.io/badge/🔧_OpenRouter_Backup-Infrastructure_failures_only-9C27B0?style=for-the-badge)
+
+### 📊 Scalability
+
+![Daily Processing](https://img.shields.io/badge/📰_Daily_Processing-3000_articles-00C7B7?style=for-the-badge)
+
+![Publishing](https://img.shields.io/badge/📝_Publishing-10+_summaries_per_site-4285F4?style=for-the-badge)
+
+![Uptime](https://img.shields.io/badge/⏰_Uptime-99.9%25_with_automatic_failover-76B900?style=for-the-badge)
 
 ---
 
@@ -210,11 +206,15 @@ Infrastructure:
 
 2asy demonstrates that **production AI applications** can run entirely on local infrastructure:
 
-✅ **Reliability** - 99.9% uptime with proper setup
-✅ **Scalability** - Handling 1000+ daily users
-✅ **Cost-Effective** - 95% cost reduction vs cloud
-✅ **Privacy** - Complete data control
-✅ **Performance** - Fast enough for real-time publishing
+![Reliability](https://img.shields.io/badge/✅_Reliability-99.9%25_uptime_with_proper_setup-00C7B7?style=for-the-badge)
+
+![Scalability](https://img.shields.io/badge/✅_Scalability-Handling_1000+_daily_users-4285F4?style=for-the-badge)
+
+![Cost-Effective](https://img.shields.io/badge/✅_Cost--Effective-95%25_cost_reduction_vs_cloud-FF6F00?style=for-the-badge)
+
+![Privacy](https://img.shields.io/badge/✅_Privacy-Complete_data_control-9C27B0?style=for-the-badge)
+
+![Performance](https://img.shields.io/badge/✅_Performance-Fast_enough_for_real--time_publishing-76B900?style=for-the-badge)
 
 ### Reusable Components
 
@@ -268,17 +268,6 @@ from llm_gateway import LiteLLMClient
 # See LLM-Applications repo for examples
 ```
 
-### 4. Deploy Ghost CMS
-
-```bash
-docker run -d \
-  --name ghost \
-  -p 2368:2368 \
-  -e url=http://your-domain.com \
-  -v ghost_data:/var/lib/ghost/content \
-  ghost:latest
-```
-
 ---
 
 ## 📊 Monitoring & Maintenance
@@ -327,16 +316,24 @@ Every article you see was:
 ## 💡 Key Takeaways
 
 ### For Developers
-- **Local LLMs are production-ready** for real applications
-- **Proper infrastructure** (gateways, monitoring, failover) is crucial
-- **Reusable components** accelerate development
-- **Cost savings are massive** (95%+) vs cloud APIs
+
+![Production Ready](https://img.shields.io/badge/✅_Local_LLMs-Production--ready_for_real_applications-00C7B7?style=for-the-badge)
+
+![Infrastructure](https://img.shields.io/badge/🏗️_Infrastructure-Gateways,_monitoring,_failover_crucial-4285F4?style=for-the-badge)
+
+![Reusable Components](https://img.shields.io/badge/🧩_Reusable_Components-Accelerate_development-FF6F00?style=for-the-badge)
+
+![Cost Savings](https://img.shields.io/badge/💰_Cost_Savings-95%25+_vs_cloud_APIs-76B900?style=for-the-badge)
 
 ### For Businesses
-- **AI applications don't require cloud APIs** and subscription fees
-- **Privacy and control** are achievable with local deployment
-- **Scalability is possible** with proper architecture
-- **ROI is immediate** with cost reduction
+
+![No Cloud APIs](https://img.shields.io/badge/🚫_No_Cloud_APIs-Zero_subscription_fees-00C7B7?style=for-the-badge)
+
+![Privacy & Control](https://img.shields.io/badge/🔒_Privacy_&_Control-Achievable_with_local_deployment-4285F4?style=for-the-badge)
+
+![Scalability](https://img.shields.io/badge/📈_Scalability-Possible_with_proper_architecture-9C27B0?style=for-the-badge)
+
+![Immediate ROI](https://img.shields.io/badge/💵_ROI-Immediate_with_cost_reduction-76B900?style=for-the-badge)
 
 ---
 
