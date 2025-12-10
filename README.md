@@ -191,10 +191,10 @@ Infrastructure:
 
 | Solution | Monthly Cost | Notes |
 |----------|--------------|-------|
-| **2asy (Local)** | **~$5~10** | Electricity only |
-| OpenAI GPT-4 API | ~$800-1200 | 10 articles/day estimate |
-| Claude API | ~$600-1000 | Similar usage |
-| Cohere | ~$400-800 | Lower tier models |
+| **2asy (Local)** | **~$5-10** | Electricity only |
+| OpenAI GPT-4o API | ~$800-850 | Based on ~37M input + 74M output tokens |
+| Claude Sonnet 4.5 API | ~$1,200-1,250 | Premium quality, expensive at scale |
+| Cohere Command R | ~$100-150 | Mid-tier alternative |
 
 **Savings: 95%+**
 
